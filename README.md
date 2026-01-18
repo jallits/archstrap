@@ -192,6 +192,8 @@ The installer also scans `dmesg` for missing firmware warnings to help identify 
 | Turing | RTX 2000, GTX 1600 series | nvidia-open |
 | Older (Pascal, Maxwell, etc.) | GTX 1000 series and older | nvidia (proprietary) |
 
+*Note: Non-DKMS packages are used for reliability with UKI + Secure Boot. Kernel headers are installed to allow switching to DKMS versions if you later install multiple kernels.*
+
 ### Mirror and System Management
 
 | Feature | Tool | Configuration |

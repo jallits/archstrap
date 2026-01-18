@@ -8,8 +8,10 @@ run_step() {
 
     # Determine kernel package
     local kernel_package="linux"
+    local kernel_headers="linux-headers"
     if [[ "$(config_get use_hardened_kernel)" == "1" ]]; then
         kernel_package="linux-hardened"
+        kernel_headers="linux-hardened-headers"
         log_info "Using hardened kernel for enhanced security"
     fi
 
@@ -18,6 +20,7 @@ run_step() {
         # Base system
         "base"
         "${kernel_package}"
+        "${kernel_headers}"
         "linux-firmware"
         "btrfs-progs"
 

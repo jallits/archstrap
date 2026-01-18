@@ -114,6 +114,8 @@ archstrap/
 ### Hardware Detection
 - Auto-detect and install appropriate CPU microcode (Intel/AMD)
 - Auto-detect GPU drivers (Intel, AMD, NVIDIA with nvidia-open for Turing+, hybrid graphics)
+  - Uses non-DKMS packages for reliability with UKI + Secure Boot
+  - Kernel headers installed to allow DKMS conversion if users add multiple kernels later
 - Auto-detect and configure audio (Pipewire + Wireplumber)
 - Auto-detect and configure Bluetooth (bluez)
 - Auto-detect fingerprint readers (fprintd + libfprint)
