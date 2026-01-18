@@ -1,0 +1,20 @@
+# systemd-networkd configuration for wireless interfaces
+# /etc/systemd/network/25-wireless.network
+# Used in conjunction with iwd for wireless management
+
+[Match]
+Name=wl*
+
+[Network]
+DHCP=yes
+IPv6PrivacyExtensions=yes
+IgnoreCarrierLoss=3s
+
+[DHCPv4]
+RouteMetric=600
+UseDNS=yes
+UseNTP=yes
+
+[IPv6AcceptRA]
+RouteMetric=600
+UseDNS=yes

@@ -1,0 +1,19 @@
+# systemd-networkd configuration for WWAN (mobile broadband) interfaces
+# /etc/systemd/network/30-wwan.network
+# Used in conjunction with ModemManager
+
+[Match]
+Name=wwan*
+Name=wwp*
+
+[Network]
+DHCP=yes
+IPv6PrivacyExtensions=yes
+
+[DHCPv4]
+RouteMetric=700
+UseDNS=yes
+
+[IPv6AcceptRA]
+RouteMetric=700
+UseDNS=yes
