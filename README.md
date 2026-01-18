@@ -1,6 +1,6 @@
 # archstrap
 
-A modern, opinionated Arch Linux installation script with a user-friendly TUI.
+A modern, opinionated Arch Linux installation script with a user-friendly TUI. Provides a minimal, secure base system ready for your preferred desktop environment.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Arch Linux](https://img.shields.io/badge/Arch%20Linux-1793D1?logo=arch-linux&logoColor=white)
@@ -20,6 +20,7 @@ A modern, opinionated Arch Linux installation script with a user-friendly TUI.
 - **Resume Support**: Installation can be resumed if interrupted
 - **Dry-Run Mode**: Test the installation flow without making changes
 - **Automatic Timezone**: Location-based timezone updates via GeoClue
+- **Minimal Base**: No GUI by default - install your preferred desktop or see [Hyprstrap](https://github.com/jallits/hyprstrap) for a complete setup
 
 ## Screenshots
 
@@ -304,6 +305,43 @@ When EFI is installed on removable storage, optionally create an encrypted secre
 - DNS-over-TLS with privacy-respecting resolvers (Cloudflare, Quad9)
 - DNSSEC validation enabled
 - SSH hardening configuration (key-only auth, no root login)
+
+## Post-Installation
+
+### GUI Environment
+
+archstrap provides a **minimal base system** without a display manager, window manager, or desktop environment. This gives you full control over your graphical environment.
+
+**Options:**
+
+1. **[Hyprstrap](https://github.com/jallits/hyprstrap)** - A companion project that builds on archstrap to provide a complete Hyprland-based desktop environment with:
+   - Hyprland (tiling Wayland compositor)
+   - Pre-configured applications and tools
+   - Beautiful theming and aesthetics
+   - Optimized for productivity
+
+2. **Install your preferred environment** - After reboot, install any desktop environment or window manager you prefer:
+   ```bash
+   # Example: GNOME
+   sudo pacman -S gnome gnome-extra gdm
+   sudo systemctl enable gdm
+
+   # Example: KDE Plasma
+   sudo pacman -S plasma kde-applications sddm
+   sudo systemctl enable sddm
+
+   # Example: i3 + LightDM
+   sudo pacman -S i3-wm i3status dmenu lightdm lightdm-gtk-greeter
+   sudo systemctl enable lightdm
+   ```
+
+### Next Steps
+
+After rebooting into your new system:
+1. Log in as the user you created during installation
+2. Configure networking if needed (WiFi connections, etc.)
+3. Install and configure your preferred GUI environment
+4. Set up additional applications and services
 
 ## Project Structure
 

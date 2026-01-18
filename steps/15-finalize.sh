@@ -82,6 +82,13 @@ run_step() {
     echo "  3. Log in as '$(config_get username)'"
     echo "  4. Use 'sudo' for administrative tasks"
     echo
+    echo "GUI Environment:"
+    echo "  This installation provides a minimal base system without a"
+    echo "  display manager, window manager, or desktop environment."
+    echo
+    echo "  - For a complete Hyprland setup, see: https://github.com/jallits/hyprstrap"
+    echo "  - Or install your preferred environment after reboot"
+    echo
     echo "Documentation: https://wiki.archlinux.org"
     echo
 
