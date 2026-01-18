@@ -360,7 +360,8 @@ btrfs_mount_subvolumes() {
     run mount -o "subvol=@,${mount_opts}" "${device}" "${mount_point}"
 
     # Create mount points
-    run mkdir -p "${mount_point}"/{home,.snapshots,swap,var/cache,var/log,boot}
+    # Note: /boot stays on encrypted root, /efi is the ESP mount point
+    run mkdir -p "${mount_point}"/{home,.snapshots,swap,var/cache,var/log,boot,efi}
 
     # Mount other subvolumes
     run mount -o "subvol=@home,${mount_opts}" "${device}" "${mount_point}/home"
@@ -375,9 +376,11 @@ mount_efi() {
     local partition="$1"
     local mount_point="$2"
 
-    log_info "Mounting EFI partition: ${partition} -> ${mount_point}/boot"
-    run mkdir -p "${mount_point}/boot"
-    run mount "${partition}" "${mount_point}/boot"
+    # Mount ESP at /efi to minimize unencrypted data
+    # /boot stays on encrypted root, only UKI goes to /efi
+    log_info "Mounting EFI partition: ${partition} -> ${mount_point}/efi"
+    run mkdir -p "${mount_point}/efi"
+    run mount "${partition}" "${mount_point}/efi"
 }
 
 # Unmount all installation mounts

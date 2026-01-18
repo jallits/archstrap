@@ -79,10 +79,10 @@ ALL_microcode=(/boot/*-ucode.img)
 
 PRESETS=('default' 'fallback')
 
-default_uki="/boot/EFI/Linux/arch-linux.efi"
+default_uki="/efi/EFI/Linux/arch-linux.efi"
 default_options=""
 
-fallback_uki="/boot/EFI/Linux/arch-linux-fallback.efi"
+fallback_uki="/efi/EFI/Linux/arch-linux-fallback.efi"
 fallback_options="-S autodetect"
 EOF
     fi
@@ -136,8 +136,8 @@ UseFirmwareBackground=false
 EOF
     fi
 
-    # Create UKI directory
-    run mkdir -p "${MOUNT_POINT}/boot/EFI/Linux"
+    # Create UKI directory on ESP
+    run mkdir -p "${MOUNT_POINT}/efi/EFI/Linux"
 
     # Generate UKI
     log_info "Generating Unified Kernel Image"
@@ -161,8 +161,8 @@ EOF
                 arch-chroot "${MOUNT_POINT}" sbctl create-keys
 
                 # Sign the UKI
-                arch-chroot "${MOUNT_POINT}" sbctl sign -s /boot/EFI/Linux/arch-linux.efi
-                arch-chroot "${MOUNT_POINT}" sbctl sign -s /boot/EFI/Linux/arch-linux-fallback.efi
+                arch-chroot "${MOUNT_POINT}" sbctl sign -s /efi/EFI/Linux/arch-linux.efi
+                arch-chroot "${MOUNT_POINT}" sbctl sign -s /efi/EFI/Linux/arch-linux-fallback.efi
 
                 # Enroll keys (with Microsoft keys for compatibility)
                 if arch-chroot "${MOUNT_POINT}" sbctl enroll-keys -m; then
@@ -189,8 +189,8 @@ EOF
                 fi
 
                 # Sign UKIs for when Secure Boot is enabled
-                arch-chroot "${MOUNT_POINT}" sbctl sign -s /boot/EFI/Linux/arch-linux.efi
-                arch-chroot "${MOUNT_POINT}" sbctl sign -s /boot/EFI/Linux/arch-linux-fallback.efi
+                arch-chroot "${MOUNT_POINT}" sbctl sign -s /efi/EFI/Linux/arch-linux.efi
+                arch-chroot "${MOUNT_POINT}" sbctl sign -s /efi/EFI/Linux/arch-linux-fallback.efi
 
                 log_info "UKIs signed - to enable Secure Boot later:"
                 log_info "  1. Enter UEFI/BIOS setup"

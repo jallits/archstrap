@@ -11,9 +11,9 @@ main() {
     mkinitcpio -P
 
     # Verify UKI was created
-    if [[ -f /boot/EFI/Linux/arch-linux.efi ]]; then
+    if [[ -f /efi/EFI/Linux/arch-linux.efi ]]; then
         echo "UKI created successfully"
-        ls -la /boot/EFI/Linux/
+        ls -la /efi/EFI/Linux/
     else
         echo "ERROR: UKI not found!"
         exit 1

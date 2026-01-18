@@ -121,6 +121,8 @@ Options:
 
 Following the Discoverable Partitions Specification:
 - **EFI System Partition**: 512MB FAT32 (optionally on removable storage)
+  - Mounted at `/efi` - contains only the UKI (Unified Kernel Image)
+  - `/boot` remains on encrypted root to minimize unencrypted data exposure
 - **Root Partition**: LUKS2-encrypted BTRFS (header optionally on removable storage)
 - **Secrets Partition**: Optional LUKS2-encrypted ext4 on removable storage for sensitive data
 
@@ -285,7 +287,7 @@ When EFI is installed on removable storage, optionally create an encrypted secre
 - Network stack hardening (SYN cookies, rp_filter, no redirects)
 
 ### Filesystem Security
-- Secure mount options: `nodev`, `nosuid`, `noexec` on /boot, /home, /var
+- Secure mount options: `nodev`, `nosuid`, `noexec` on /efi, /home, /var
 - Restrictive umask (0077) for new files
 - Protected hardlinks/symlinks via sysctl
 

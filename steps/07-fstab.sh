@@ -9,8 +9,8 @@ harden_fstab() {
 
     log_info "Applying security hardening to fstab mount options"
 
-    # /boot - nodev,nosuid,noexec (prevent execution from boot partition)
-    sed -i '/\/boot/s/\(rw[^[:space:]]*\)/\1,nodev,nosuid,noexec/' "${fstab_file}"
+    # /efi - nodev,nosuid,noexec (ESP contains only UKI, never needs execution)
+    sed -i '/\/efi/s/\(rw[^[:space:]]*\)/\1,nodev,nosuid,noexec/' "${fstab_file}"
 
     # /home - nodev,nosuid (no device files or setuid in home)
     sed -i '/@home.*\/home/s/\(rw[^[:space:]]*\)/\1,nodev,nosuid/' "${fstab_file}"
