@@ -31,6 +31,13 @@ run_step() {
     log_info "Cleaning package cache"
     run arch-chroot "${MOUNT_POINT}" pacman -Scc --noconfirm
 
+    # Copy installation log to target system
+    log_info "Copying installation log to target system"
+    if [[ "${DRY_RUN}" != "1" ]] && [[ -f "${LOG_FILE}" ]]; then
+        cp "${LOG_FILE}" "${MOUNT_POINT}/var/log/install.log"
+        chmod 640 "${MOUNT_POINT}/var/log/install.log"
+    fi
+
     # Sync filesystems
     log_info "Syncing filesystems"
     run sync
