@@ -157,16 +157,27 @@ run_step() {
     }
     config_set "luks_passphrase" "${passphrase}"
 
-    # Encryption strength
+    # Encryption strength - check RAM availability first
     local encryption_strength
-    encryption_strength=$(tui_radiolist "Encryption Strength" \
-        "Select encryption strength for LUKS2:\n\nHigher strength increases unlock time but provides better security." \
-        18 70 6 \
-        "standard" "AES-256, Argon2id (default settings)" "on" \
-        "high" "AES-256, Argon2id (4GB memory, 5s unlock)" "off" \
-        "maximum" "AES-256 + HMAC integrity, Argon2id (4GB, 5s)" "off") || {
+    if has_ram_for_strong_encryption; then
+        # System has enough RAM for all encryption options
+        encryption_strength=$(tui_radiolist "Encryption Strength" \
+            "Select encryption strength for LUKS2:\n\nHigher strength increases unlock time but provides better security." \
+            18 70 6 \
+            "standard" "AES-256, Argon2id (default settings)" "on" \
+            "high" "AES-256, Argon2id (4GB memory, 5s unlock)" "off" \
+            "maximum" "AES-256 + HMAC integrity, Argon2id (4GB, 5s)" "off") || {
+            encryption_strength="standard"
+        }
+    else
+        # Insufficient RAM - only standard encryption available
+        local ram_gb
+        ram_gb="$(get_total_ram_gb)"
+        tui_msgbox "Encryption Strength" \
+            "System has ${ram_gb}GB RAM.\n\nHigh and Maximum encryption require 5GB+ RAM for the Argon2id key derivation function (4GB allocation + system overhead).\n\nUsing Standard encryption strength." \
+            12 65
         encryption_strength="standard"
-    }
+    fi
     config_set "encryption_strength" "${encryption_strength}"
 
     # Warn about maximum encryption performance impact
