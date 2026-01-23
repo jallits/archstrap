@@ -157,6 +157,25 @@ run_step() {
     }
     config_set "luks_passphrase" "${passphrase}"
 
+    # Encryption strength
+    local encryption_strength
+    encryption_strength=$(tui_radiolist "Encryption Strength" \
+        "Select encryption strength for LUKS2:\n\nHigher strength increases unlock time but provides better security." \
+        18 70 6 \
+        "standard" "AES-256, Argon2id (default settings)" "on" \
+        "high" "AES-256, Argon2id (4GB memory, 5s unlock)" "off" \
+        "maximum" "AES-256 + HMAC integrity, Argon2id (4GB, 5s)" "off") || {
+        encryption_strength="standard"
+    }
+    config_set "encryption_strength" "${encryption_strength}"
+
+    # Warn about maximum encryption performance impact
+    if [[ "${encryption_strength}" == "maximum" ]]; then
+        tui_msgbox "Performance Notice" \
+            "Maximum encryption enables dm-integrity for authenticated encryption.\n\nThis provides:\n• Protection against disk tampering\n• Cryptographic integrity verification\n\nTrade-offs:\n• ~2x disk space overhead for integrity metadata\n• Reduced I/O performance\n• Requires kernel dm-integrity support" \
+            14 65
+    fi
+
     # ==========================================
     # SYSTEM CONFIGURATION
     # ==========================================
@@ -378,6 +397,13 @@ run_step() {
     else
         summary+="LUKS header:     On root partition\n"
     fi
+    local enc_strength
+    enc_strength="$(config_get encryption_strength)"
+    case "${enc_strength}" in
+        high)    summary+="Encryption:      High (Argon2id 4GB/5s)\n" ;;
+        maximum) summary+="Encryption:      Maximum (integrity + Argon2id)\n" ;;
+        *)       summary+="Encryption:      Standard\n" ;;
+    esac
     if [[ "$(config_get secrets_on_removable)" == "1" ]]; then
         summary+="Secrets storage: $(config_get efi_disk) (encrypted)\n"
     fi

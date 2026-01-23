@@ -249,12 +249,17 @@ format_ext4() {
 }
 
 # LUKS2 format with optional detached header
+# Encryption strength levels:
+#   standard: AES-256-XTS, Argon2id with default parameters
+#   high: AES-256-XTS, Argon2id with 4GB memory, 5s iteration time
+#   maximum: AES-256-XTS + HMAC-SHA256 integrity, Argon2id with 4GB memory, 5s iteration time
 luks_format() {
     local partition="$1"
     local passphrase="$2"
     local header_file="${3:-}"
+    local strength="${4:-standard}"
 
-    log_info "Formatting LUKS2 container on ${partition}"
+    log_info "Formatting LUKS2 container on ${partition} (strength: ${strength})"
 
     local luks_opts=(
         --type luks2
@@ -264,7 +269,30 @@ luks_format() {
         --pbkdf argon2id
         --use-random
         --batch-mode
+        --sector-size 4096
     )
+
+    # Apply encryption strength settings
+    case "${strength}" in
+        high)
+            # Stronger Argon2id parameters: 4GB memory, 5 second unlock time
+            luks_opts+=(--pbkdf-memory 4194304)
+            luks_opts+=(--iter-time 5000)
+            log_info "Using high encryption: Argon2id with 4GB memory, 5s unlock"
+            ;;
+        maximum)
+            # Strongest settings: integrity + stronger Argon2id
+            luks_opts+=(--pbkdf-memory 4194304)
+            luks_opts+=(--iter-time 5000)
+            luks_opts+=(--integrity hmac-sha256)
+            log_info "Using maximum encryption: Argon2id with 4GB memory, 5s unlock, HMAC-SHA256 integrity"
+            log_warn "Integrity mode has ~2x disk space overhead and performance impact"
+            ;;
+        *)
+            # Standard: use cryptsetup defaults for Argon2id
+            log_info "Using standard encryption: Argon2id with default parameters"
+            ;;
+    esac
 
     if [[ -n "${header_file}" ]]; then
         luks_opts+=(--header "${header_file}")
