@@ -263,6 +263,13 @@ All security hardening follows [Arch Wiki Security recommendations](https://wiki
 - AES-XTS-PLAIN64 cipher with 512-bit key
 - Argon2id key derivation
 - Optional detached header on removable storage for enhanced security
+- Configurable encryption strength levels:
+
+| Level | Argon2id Memory | Unlock Time | Integrity | Use Case |
+|-------|-----------------|-------------|-----------|----------|
+| Standard | 1GB (default) | ~2s | No | Normal use |
+| High | 4GB | 5s | No | Higher security |
+| Maximum | 4GB | 5s | HMAC-SHA256 | Tampering protection (~2x disk overhead) |
 
 ### Secure Boot
 - Unified Kernel Image (UKI) signed with sbctl
@@ -393,6 +400,7 @@ The TUI will guide you through configuring:
 - LUKS header location (with root or removable)
 - Encrypted secrets partition on removable storage (for GPG/SSH keys)
 - Encryption passphrase(s)
+- Encryption strength (standard, high, or maximum with integrity)
 
 **System:**
 - Hostname

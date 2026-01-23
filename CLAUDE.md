@@ -64,10 +64,16 @@ archstrap/
 - Partition table follows the Discoverable Disk Partition Specification
 - EFI partition optionally installed to removable storage (SD card, USB)
 - Root partition encrypted with LUKS2 (header optionally on removable storage)
+- Configurable encryption strength (standard, high, maximum with integrity)
 - Optional encrypted secrets partition on removable storage for GPG/SSH keys
 - BTRFS filesystem with subvolumes: `@`, `@home`, `@snapshots`, `@swap`, `@var_cache`, `@var_log`
 - Per-user home directories as nested BTRFS subvolumes
 - Swapfile sized for hibernation support
+
+### Encryption Strength Levels
+- **Standard**: AES-256-XTS, Argon2id with default parameters (~2s unlock)
+- **High**: AES-256-XTS, Argon2id with 4GB memory, 5s unlock time
+- **Maximum**: High settings + HMAC-SHA256 integrity (authenticated encryption, ~2x disk overhead)
 
 ### Snapshot Management
 - Snapper configured for root (`/`) with admin-only access

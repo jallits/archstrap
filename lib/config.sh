@@ -29,6 +29,8 @@ config_init() {
     CONFIG[use_hardened_kernel]="1"
     CONFIG[enable_firewall]="1"
     CONFIG[enable_apparmor]="1"
+    # Encryption strength: standard, high, maximum
+    CONFIG[encryption_strength]="standard"
 }
 
 # Set a configuration value
@@ -366,6 +368,14 @@ config_summary() {
     else
         echo "LUKS header:     On root partition"
     fi
+
+    local enc_strength
+    enc_strength="$(config_get encryption_strength "standard")"
+    case "${enc_strength}" in
+        high)    echo "Encryption:      High (Argon2id 4GB/5s)" ;;
+        maximum) echo "Encryption:      Maximum (integrity + Argon2id 4GB/5s)" ;;
+        *)       echo "Encryption:      Standard" ;;
+    esac
 
     echo "AUR helper:      $(config_get aur_helper)"
     echo "Bluetooth:       $(config_get install_bluetooth)"

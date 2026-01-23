@@ -46,9 +46,13 @@ run_step() {
         state_set "luks_header_file" "${header_file}"
     fi
 
+    # Get encryption strength setting
+    local encryption_strength
+    encryption_strength="$(config_get encryption_strength "standard")"
+
     # Format LUKS2 container
     log_info "Creating LUKS2 encrypted container on ${root_partition}"
-    luks_format "${root_partition}" "${passphrase}" "${header_file}"
+    luks_format "${root_partition}" "${passphrase}" "${header_file}" "${encryption_strength}"
 
     # Get LUKS UUID
     local luks_uuid
@@ -87,9 +91,9 @@ run_step() {
             secrets_passphrase="${passphrase}"
         fi
 
-        # Format LUKS2 container for secrets
+        # Format LUKS2 container for secrets (use same encryption strength)
         log_info "Creating LUKS2 encrypted container for secrets on ${secrets_partition}"
-        luks_format "${secrets_partition}" "${secrets_passphrase}"
+        luks_format "${secrets_partition}" "${secrets_passphrase}" "" "${encryption_strength}"
 
         # Get secrets LUKS UUID
         if [[ "${DRY_RUN}" != "1" ]]; then
