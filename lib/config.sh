@@ -307,6 +307,22 @@ get_disk_size() {
     fi
 }
 
+# Get total system RAM in GB
+get_total_ram_gb() {
+    local ram_kb
+    ram_kb="$(grep MemTotal /proc/meminfo | awk '{print $2}')"
+    echo $(( ram_kb / 1024 / 1024 ))
+}
+
+# Check if system has enough RAM for high/maximum encryption (requires 4GB+ for Argon2id)
+# Returns 0 if sufficient, 1 if not
+has_ram_for_strong_encryption() {
+    local ram_gb
+    ram_gb="$(get_total_ram_gb)"
+    # Require 5GB total to ensure 4GB available for Argon2id after system usage
+    [[ "${ram_gb}" -ge 5 ]]
+}
+
 # Calculate swap size based on RAM (for hibernation)
 calculate_swap_size() {
     local ram_kb
