@@ -304,6 +304,7 @@ When EFI is installed on removable storage, optionally create an encrypted secre
 
 ### Access Control
 - **Root account locked** - use sudo for administration
+- **User groups**: wheel, video, input, render, storage, rfkill (for desktop/Wayland)
 - **AppArmor** mandatory access control (optional)
 - **nftables** firewall with restrictive defaults (deny inbound)
 - Password policy enforcement via libpwquality
