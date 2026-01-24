@@ -61,12 +61,10 @@ A modern, opinionated Arch Linux installation script with a user-friendly TUI. P
 Boot from the Arch Linux ISO and run:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/jallits/archstrap/master/install.sh -o install.sh
-chmod +x install.sh
-./install.sh
+curl -sL https://raw.githubusercontent.com/jallits/archstrap/master/archstrap | bash
 ```
 
-Or clone the repository:
+Or clone the repository manually:
 
 ```bash
 git clone https://github.com/jallits/archstrap.git
