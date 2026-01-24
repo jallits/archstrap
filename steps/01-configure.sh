@@ -290,6 +290,17 @@ run_step() {
     }
     config_set "aur_helper" "${aur_helper}"
 
+    # Network stack
+    local network_stack
+    network_stack=$(tui_radiolist "Network Stack" \
+        "Select network management stack:" \
+        16 70 5 \
+        "systemd" "systemd-networkd + iwd (lightweight, recommended)" "on" \
+        "networkmanager" "NetworkManager (GUI-friendly, DE integration)" "off") || {
+        network_stack="systemd"
+    }
+    config_set "network_stack" "${network_stack}"
+
     # ==========================================
     # SECURITY OPTIONS
     # ==========================================
@@ -426,6 +437,13 @@ run_step() {
     summary+="Timezone:        $(config_get timezone)\n"
     summary+="Locale:          $(config_get locale)\n"
     summary+="AUR helper:      $(config_get aur_helper)\n"
+    local net_stack
+    net_stack="$(config_get network_stack)"
+    if [[ "${net_stack}" == "networkmanager" ]]; then
+        summary+="Network:         NetworkManager\n"
+    else
+        summary+="Network:         systemd-networkd + iwd\n"
+    fi
     summary+="\n"
     summary+="SECURITY OPTIONS\n"
     summary+="══════════════════════════════════════\n"

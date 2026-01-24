@@ -143,10 +143,21 @@ EOF
 # Install network configuration files
 install_network_configs() {
     local root="${1:-/mnt}"
+    local stack
+    stack="$(config_get network_stack "systemd")"
+
+    log_info "Installing network configuration (${stack})"
+
+    if [[ "${stack}" == "networkmanager" ]]; then
+        # NetworkManager handles configuration automatically
+        # No static config files needed
+        log_info "NetworkManager will handle network configuration dynamically"
+        return 0
+    fi
+
+    # systemd-networkd configuration
     local networkd_dir="${root}/etc/systemd/network"
     local iwd_dir="${root}/etc/iwd"
-
-    log_info "Installing network configuration"
 
     run mkdir -p "${networkd_dir}"
     run mkdir -p "${iwd_dir}"
@@ -190,9 +201,22 @@ install_network_configs() {
     fi
 }
 
-# Get network packages based on detected hardware
+# Get network packages based on detected hardware and selected stack
 get_network_packages() {
-    local packages=("iwd" "systemd-resolvconf")
+    local stack
+    stack="$(config_get network_stack "systemd")"
+    local packages=()
+
+    if [[ "${stack}" == "networkmanager" ]]; then
+        # NetworkManager stack
+        packages+=("networkmanager")
+        if detect_wireless; then
+            packages+=("wpa_supplicant")
+        fi
+    else
+        # systemd-networkd stack (default)
+        packages+=("iwd" "systemd-resolvconf")
+    fi
 
     if detect_wwan; then
         packages+=("modemmanager" "usb_modeswitch")
@@ -232,17 +256,33 @@ install_resolved_config() {
 # Enable network services in chroot
 enable_network_services() {
     local root="${1:-/mnt}"
+    local stack
+    stack="$(config_get network_stack "systemd")"
 
-    log_info "Enabling network services"
+    log_info "Enabling network services (${stack})"
 
-    run arch-chroot "${root}" systemctl enable systemd-networkd.service
-    run arch-chroot "${root}" systemctl enable systemd-resolved.service
-    run arch-chroot "${root}" systemctl enable iwd.service
+    if [[ "${stack}" == "networkmanager" ]]; then
+        # NetworkManager stack
+        run arch-chroot "${root}" systemctl enable NetworkManager.service
 
-    if detect_wwan; then
-        run arch-chroot "${root}" systemctl enable ModemManager.service
+        if detect_wwan; then
+            run arch-chroot "${root}" systemctl enable ModemManager.service
+        fi
+
+        # NetworkManager handles DNS, but we can still use systemd-resolved
+        run arch-chroot "${root}" systemctl enable systemd-resolved.service
+        run ln -sf /run/systemd/resolve/stub-resolv.conf "${root}/etc/resolv.conf"
+    else
+        # systemd-networkd stack (default)
+        run arch-chroot "${root}" systemctl enable systemd-networkd.service
+        run arch-chroot "${root}" systemctl enable systemd-resolved.service
+        run arch-chroot "${root}" systemctl enable iwd.service
+
+        if detect_wwan; then
+            run arch-chroot "${root}" systemctl enable ModemManager.service
+        fi
+
+        # Create resolv.conf symlink
+        run ln -sf /run/systemd/resolve/stub-resolv.conf "${root}/etc/resolv.conf"
     fi
-
-    # Create resolv.conf symlink
-    run ln -sf /run/systemd/resolve/stub-resolv.conf "${root}/etc/resolv.conf"
 }

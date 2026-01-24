@@ -16,7 +16,7 @@ A modern, opinionated Arch Linux installation script with a user-friendly TUI. P
 - **Hardware Detection**: Auto-configures CPU microcode, GPU drivers, audio, Bluetooth, fingerprint readers, Thunderbolt, sensors, and more
 - **Mirror Optimization**: Reflector auto-selects fastest mirrors based on your location
 - **Firmware Updates**: fwupd integration for BIOS/UEFI updates
-- **Modern Networking**: systemd-networkd + systemd-resolved + iwd for wireless
+- **Modern Networking**: Choice of systemd-networkd + iwd or NetworkManager
 - **Resume Support**: Installation can be resumed if interrupted
 - **Dry-Run Mode**: Test the installation flow without making changes
 - **Automatic Timezone**: Location-based timezone updates via GeoClue
@@ -130,7 +130,7 @@ Following the Discoverable Partitions Specification:
 - **Base**: base, linux/linux-hardened, linux-firmware, btrfs-progs
 - **Boot**: systemd-ukify, sbsigntools, efibootmgr, tpm2-tools, plymouth (with early KMS)
 - **Shell**: zsh (default), sudo, vim
-- **Network**: iwd, systemd-resolvconf
+- **Network**: systemd-networkd + iwd (default) or NetworkManager
 - **Audio**: pipewire, pipewire-alsa, pipewire-pulse, wireplumber
 - **Bluetooth**: bluez, bluez-utils
 - **Security**: libpwquality, nftables, apparmor
@@ -408,6 +408,7 @@ The TUI will guide you through configuring:
 - Timezone (auto-detected)
 - Locale and keyboard layout
 - AUR helper (paru, yay, or none)
+- Network stack (systemd-networkd or NetworkManager)
 
 **Security (defaults to maximum security):**
 - Hardened kernel (linux-hardened vs standard)
