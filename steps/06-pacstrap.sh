@@ -40,9 +40,6 @@ run_step() {
         "man-pages"
         "texinfo"
 
-        # Networking (base)
-        "iwd"
-
         # Filesystem tools
         "dosfstools"
         "e2fsprogs"
