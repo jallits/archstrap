@@ -31,6 +31,8 @@ config_init() {
     CONFIG[enable_apparmor]="1"
     # Encryption strength: standard, high, maximum
     CONFIG[encryption_strength]="standard"
+    # Network stack: systemd (systemd-networkd + iwd) or networkmanager
+    CONFIG[network_stack]="systemd"
 }
 
 # Set a configuration value
