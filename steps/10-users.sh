@@ -13,9 +13,15 @@ run_step() {
     user_password="$(config_get user_password)"
 
     # Create user with ZSH as default shell
-    # User is added to wheel group for sudo access
+    # Groups:
+    #   wheel   - sudo access
+    #   video   - backlight control, GPU access
+    #   input   - direct input device access (Wayland compositors)
+    #   render  - GPU compute/rendering
+    #   storage - removable media access
+    #   rfkill  - wireless toggle without sudo
     log_info "Creating user: ${username} (with sudo privileges)"
-    run arch-chroot "${MOUNT_POINT}" useradd -m -G wheel -s /bin/zsh "${username}"
+    run arch-chroot "${MOUNT_POINT}" useradd -m -G wheel,video,input,render,storage,rfkill -s /bin/zsh "${username}"
 
     # Set user password
     log_info "Setting password for ${username}"

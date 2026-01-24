@@ -163,6 +163,7 @@ archstrap/
 - Home directories as BTRFS subvolumes with snapshots
 - xdg-user-dirs for directory structure
 - GeoClue for timezone auto-detection (with manual fallback)
+- User added to groups: wheel, video, input, render, storage, rfkill
 
 ### Package Constraints
 - Avoid GNOME Foundation software
