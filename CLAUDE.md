@@ -154,8 +154,10 @@ archstrap/
 - Timezone updates automatically when location changes (e.g., travel)
 
 ### Networking
-- iwd for wireless
-- systemd-networkd + systemd-resolved
+- User-selectable network stack:
+  - systemd-networkd + iwd (default, lightweight)
+  - NetworkManager (GUI-friendly, DE integration)
+- systemd-resolved for DNS with DoT/DNSSEC
 - Configurations for ethernet, WLAN, and WWAN
 
 ### User Environment
