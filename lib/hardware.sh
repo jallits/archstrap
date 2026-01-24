@@ -151,9 +151,10 @@ get_gpu_packages() {
         esac
     done
 
-    # Add hybrid graphics support if needed
-    if has_hybrid_graphics; then
-        packages+=("switcheroo-control")
+    # Add nvidia-prime for NVIDIA hybrid graphics (provides prime-run wrapper)
+    # AMD hybrid graphics works with DRI_PRIME=1 without additional packages
+    if has_hybrid_graphics && [[ " ${packages[*]} " =~ " nvidia" ]]; then
+        packages+=("nvidia-prime")
     fi
 
     # Remove duplicates and echo

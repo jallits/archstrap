@@ -24,12 +24,6 @@ run_step() {
         run arch-chroot "${MOUNT_POINT}" systemctl enable bluetooth.service
     fi
 
-    # Configure hybrid graphics if present
-    if has_hybrid_graphics; then
-        log_info "Configuring hybrid graphics"
-        run arch-chroot "${MOUNT_POINT}" systemctl enable switcheroo-control.service
-    fi
-
     # Configure NVIDIA if present
     local gpus
     gpus="$(detect_gpu)"
