@@ -1,0 +1,15 @@
+#!/bin/bash
+# archstrap - Bootstrap script for archstrap installer
+# Downloads and runs the full installer from GitHub
+
+set -euo pipefail
+
+REPO_URL="https://github.com/jallits/archstrap.git"
+INSTALL_DIR="/tmp/archstrap-$$"
+
+echo "==> Downloading archstrap..."
+git clone --depth 1 "${REPO_URL}" "${INSTALL_DIR}"
+
+echo "==> Starting installer..."
+cd "${INSTALL_DIR}"
+exec ./install.sh "$@"
