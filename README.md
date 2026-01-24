@@ -148,6 +148,7 @@ The installer automatically detects and configures the following hardware:
 |----------|-----------|-------------------|
 | CPU Microcode | `/proc/cpuinfo` vendor | intel-ucode / amd-ucode |
 | GPU | lspci VGA/3D devices | mesa, vulkan, nvidia-open (RTX) or nvidia |
+| Hybrid GPU | Multiple GPUs detected | nvidia-prime (provides `prime-run` for NVIDIA) |
 | Audio | `/sys/class/sound`, lspci | pipewire, wireplumber, alsa-ucm-conf |
 | Bluetooth | `/sys/class/bluetooth`, lspci/lsusb | bluez, bluez-utils |
 | Fingerprint | lsusb (Validity, Synaptics, etc.) | fprintd, libfprint |
