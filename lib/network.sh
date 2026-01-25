@@ -140,6 +140,14 @@ AutoConnect=true
 EOF
 }
 
+# Generate NetworkManager configuration for systemd-resolved integration
+generate_networkmanager_dns_config() {
+    cat << EOF
+[main]
+dns=systemd-resolved
+EOF
+}
+
 # Install network configuration files
 install_network_configs() {
     local root="${1:-/mnt}"
@@ -149,9 +157,17 @@ install_network_configs() {
     log_info "Installing network configuration (${stack})"
 
     if [[ "${stack}" == "networkmanager" ]]; then
-        # NetworkManager handles configuration automatically
-        # No static config files needed
-        log_info "NetworkManager will handle network configuration dynamically"
+        # NetworkManager handles network configuration automatically,
+        # but needs explicit config to use systemd-resolved for DNS
+        local nm_conf_dir="${root}/etc/NetworkManager/conf.d"
+        run mkdir -p "${nm_conf_dir}"
+
+        log_info "Configuring NetworkManager to use systemd-resolved"
+        if [[ "${DRY_RUN}" != "1" ]]; then
+            generate_networkmanager_dns_config > "${nm_conf_dir}/dns.conf"
+        else
+            echo -e "${MAGENTA}[DRY-RUN]${RESET} Would create ${nm_conf_dir}/dns.conf"
+        fi
         return 0
     fi
 
