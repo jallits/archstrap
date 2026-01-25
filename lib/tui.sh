@@ -351,7 +351,7 @@ tui_radiolist() {
             default_idx="${idx}"
         fi
         shift 3
-        ((idx++))
+        ((++idx))
     done
 
     if [[ ${#tags[@]} -eq 0 ]]; then
