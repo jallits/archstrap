@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-archstrap is an opinionated Arch Linux installation script targeting UEFI x86_64 systems booted from the Arch Linux ISO. It features a dialog-based TUI for user-friendly configuration.
+archstrap is an opinionated Arch Linux installation script targeting UEFI x86_64 systems booted from the Arch Linux ISO. It features a pure bash TUI for user-friendly configuration (no external dependencies like dialog required).
 
 ## Project Structure
 
@@ -17,7 +17,7 @@ archstrap/
 │   ├── disk.sh             # Disk operations (partitioning, LUKS, BTRFS)
 │   ├── hardware.sh         # Hardware detection (CPU, GPU, audio, bluetooth)
 │   ├── network.sh          # Network configuration generators
-│   ├── tui.sh              # Dialog-based TUI functions
+│   ├── tui.sh              # Pure bash TUI functions (no dialog dependency)
 │   └── quirks.sh           # Hardware quirks detection and workarounds
 ├── steps/
 │   ├── 00-preflight.sh     # System validation
@@ -56,9 +56,10 @@ archstrap/
 ## Architecture Decisions
 
 ### User Interface
-- Dialog-based TUI using `dialog` (ncurses)
-- Custom Arch-themed color scheme
-- Fallback to CLI prompts if dialog unavailable
+- Pure bash TUI using ANSI escape codes (no external dependencies)
+- Numbered menu selections for list choices
+- Cyan/green color scheme with box-drawing characters
+- Works directly from the Arch ISO without installing packages
 
 ### Disk Layout
 - Partition table follows the Discoverable Disk Partition Specification
@@ -183,7 +184,8 @@ archstrap/
 ### TUI Guidelines
 - Use `tui_*` functions from lib/tui.sh
 - Always cleanup with `tui_cleanup` on exit
-- Handle dialog cancel (return code 1) gracefully
+- Handle cancel (return code 1) gracefully
+- Functions output selected values to stdout; capture with `$()`
 
 ### Step Structure
 Each step file must define a `run_step()` function:
