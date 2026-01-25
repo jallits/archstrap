@@ -9,18 +9,18 @@ export DIALOG_OK=0
 export DIALOG_CANCEL=1
 export DIALOG_ESC=255
 
-# ANSI color codes
-TUI_RESET="\033[0m"
-TUI_BOLD="\033[1m"
-TUI_DIM="\033[2m"
-TUI_BLUE="\033[34m"
-TUI_CYAN="\033[36m"
-TUI_GREEN="\033[32m"
-TUI_RED="\033[31m"
-TUI_YELLOW="\033[33m"
-TUI_WHITE="\033[37m"
-TUI_BG_BLUE="\033[44m"
-TUI_BG_WHITE="\033[47m"
+# ANSI color codes (using $'...' for proper escape sequence interpretation)
+TUI_RESET=$'\033[0m'
+TUI_BOLD=$'\033[1m'
+TUI_DIM=$'\033[2m'
+TUI_BLUE=$'\033[34m'
+TUI_CYAN=$'\033[36m'
+TUI_GREEN=$'\033[32m'
+TUI_RED=$'\033[31m'
+TUI_YELLOW=$'\033[33m'
+TUI_WHITE=$'\033[37m'
+TUI_BG_BLUE=$'\033[44m'
+TUI_BG_WHITE=$'\033[47m'
 
 # Terminal dimensions
 TUI_HEIGHT="${TUI_HEIGHT:-0}"
@@ -42,7 +42,7 @@ tui_init() {
 # Cleanup TUI
 tui_cleanup() {
     # Show cursor, reset colors
-    printf "\033[?25h${TUI_RESET}"
+    printf '%s' $'\033[?25h'"${TUI_RESET}"
     clear
 }
 
