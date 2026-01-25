@@ -82,7 +82,7 @@ run_step() {
             if [[ "${DRY_RUN}" != "1" ]]; then
                 # Get country from IP geolocation, fallback to worldwide
                 local country=""
-                country=$(curl -s --max-time 5 "https://ipapi.co/country_code" 2>/dev/null || true)
+                country=$(curl -s --max-time 5 "https://ipinfo.io/country" 2>/dev/null | tr -d '\n' || true)
 
                 local reflector_args=(
                     --protocol https
