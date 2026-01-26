@@ -99,6 +99,12 @@ run_step() {
         run arch-chroot "${MOUNT_POINT}" systemctl enable pcscd.socket
     fi
 
+    # Enable removable media management (udisks2 + udiskie)
+    log_info "Enabling removable media management"
+    # udisks2 is D-Bus activated, no service to enable
+    # udiskie runs as a user service for auto-mounting
+    run arch-chroot "${MOUNT_POINT}" systemctl --global enable udiskie.service
+
     # ============================================
     # MIRROR AND FIRMWARE MANAGEMENT
     # ============================================
