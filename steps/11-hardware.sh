@@ -99,16 +99,9 @@ run_step() {
         run arch-chroot "${MOUNT_POINT}" systemctl enable pcscd.socket
     fi
 
-    # Enable removable media management (udisks2 + udiskie)
-    log_info "Enabling removable media management"
+    # udisks2 for removable media management
     # udisks2 is D-Bus activated, no service to enable
-    # udiskie needs a custom systemd user service (not shipped by the package)
-    if [[ "${DRY_RUN}" != "1" ]]; then
-        mkdir -p "${MOUNT_POINT}/usr/lib/systemd/user"
-        cp "${SCRIPT_DIR}/configs/systemd/user/udiskie.service" \
-            "${MOUNT_POINT}/usr/lib/systemd/user/udiskie.service"
-        arch-chroot "${MOUNT_POINT}" systemctl --global enable udiskie.service
-    fi
+    # Desktop environments typically provide automounting (udiskie, gvfs, etc.)
 
     # ============================================
     # MIRROR AND FIRMWARE MANAGEMENT
