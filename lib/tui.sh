@@ -50,7 +50,7 @@ tui_cleanup() {
 _tui_line() {
     local width="${1:-60}"
     printf "${TUI_DIM}"
-    printf '─%.0s' $(seq 1 "${width}")
+    printf '─%.0s' "$(seq 1 "${width}")"
     printf "${TUI_RESET}\n"
 }
 
@@ -61,13 +61,13 @@ _tui_title() {
 
     echo ""
     printf "${TUI_BOLD}${TUI_CYAN}┌"
-    printf '─%.0s' $(seq 1 $((width - 2)))
+    printf '─%.0s' "$(seq 1 $((width - 2)))"
     printf "┐${TUI_RESET}\n"
 
     printf "${TUI_BOLD}${TUI_CYAN}│${TUI_RESET} ${TUI_BOLD}%-$((width - 4))s ${TUI_CYAN}│${TUI_RESET}\n" "${title}"
 
     printf "${TUI_BOLD}${TUI_CYAN}└"
-    printf '─%.0s' $(seq 1 $((width - 2)))
+    printf '─%.0s' "$(seq 1 $((width - 2)))"
     printf "┘${TUI_RESET}\n"
     echo ""
 }
@@ -419,9 +419,9 @@ tui_gauge() {
     printf "%s\n\n" "${prompt}"
     printf "${TUI_CYAN}["
     printf "${TUI_GREEN}"
-    printf '█%.0s' $(seq 1 "${filled}" 2>/dev/null) || true
+    printf '█%.0s' "$(seq 1 "${filled}" 2>/dev/null)" || true
     printf "${TUI_DIM}"
-    printf '░%.0s' $(seq 1 "${empty}" 2>/dev/null) || true
+    printf '░%.0s' "$(seq 1 "${empty}" 2>/dev/null)" || true
     printf "${TUI_CYAN}]${TUI_RESET} %3d%%\n" "${percent}"
 }
 
