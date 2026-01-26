@@ -1,0 +1,13 @@
+[Unit]
+Description=udiskie automounter for removable media
+Documentation=man:udiskie(8)
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/udiskie --no-notify --no-tray
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

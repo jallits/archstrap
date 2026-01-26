@@ -278,7 +278,8 @@ get_available_disks() {
             continue
         fi
         echo "${line}"
-    done < <(lsblk -dpno NAME,SIZE,MODEL,TRAN 2>/dev/null | \
+    # Order: NAME,SIZE,TRAN,MODEL - put MODEL last since it can contain spaces
+    done < <(lsblk -dpno NAME,SIZE,TRAN,MODEL 2>/dev/null | \
         grep -E '^/dev/(sd|nvme|vd|mmcblk)' | \
         grep -v 'loop' || true)
 }
@@ -290,7 +291,8 @@ get_available_disks() {
 #   - It's connected via USB transport
 get_removable_disks() {
     local disk tran
-    while read -r disk _ _ tran; do
+    # Fields: NAME SIZE TRAN MODEL (MODEL last since it can have spaces)
+    while read -r disk _ tran _; do
         local disk_name
         disk_name="$(basename "${disk}")"
 
