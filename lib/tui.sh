@@ -144,27 +144,27 @@ tui_yesno() {
 }
 
 # Display an input box
-# Outputs the entered text to stdout
+# Outputs the entered text to stdout (visual elements go to stderr)
 tui_inputbox() {
     local title="$1"
     local prompt="$2"
     local default="${3:-}"
 
-    clear
-    _tui_title "${title}"
-    _tui_message "${prompt}"
+    clear >&2
+    _tui_title "${title}" >&2
+    _tui_message "${prompt}" >&2
 
     local input
     if [[ -n "${default}" ]]; then
-        printf "${TUI_DIM}Default: ${default}${TUI_RESET}\n"
-        printf "${TUI_BOLD}>${TUI_RESET} "
-        read -r input
+        printf "${TUI_DIM}Default: ${default}${TUI_RESET}\n" >&2
+        printf "${TUI_BOLD}>${TUI_RESET} " >&2
+        read -r input </dev/tty
         if [[ -z "${input}" ]]; then
             input="${default}"
         fi
     else
-        printf "${TUI_BOLD}>${TUI_RESET} "
-        read -r input
+        printf "${TUI_BOLD}>${TUI_RESET} " >&2
+        read -r input </dev/tty
     fi
 
     echo "${input}"
@@ -172,19 +172,19 @@ tui_inputbox() {
 }
 
 # Display a password box (masked input)
-# Outputs the entered password to stdout
+# Outputs the entered password to stdout (visual elements go to stderr)
 tui_passwordbox() {
     local title="$1"
     local prompt="$2"
 
-    clear
-    _tui_title "${title}"
-    _tui_message "${prompt}"
+    clear >&2
+    _tui_title "${title}" >&2
+    _tui_message "${prompt}" >&2
 
     local password
-    printf "${TUI_BOLD}>${TUI_RESET} "
-    read -rs password
-    echo "" >&2  # newline after hidden input (to stderr so it doesn't mix with output)
+    printf "${TUI_BOLD}>${TUI_RESET} " >&2
+    read -rs password </dev/tty
+    echo "" >&2  # newline after hidden input
 
     echo "${password}"
     return 0
@@ -192,7 +192,7 @@ tui_passwordbox() {
 
 # Display a menu (single selection from tag/description pairs)
 # Args: title prompt height width menu_height tag1 desc1 tag2 desc2 ...
-# Outputs the selected tag to stdout
+# Outputs the selected tag to stdout (visual elements go to stderr)
 tui_menu() {
     local title="$1"
     local prompt="$2"
@@ -213,22 +213,22 @@ tui_menu() {
         return 1
     fi
 
-    clear
-    _tui_title "${title}"
-    _tui_message "${prompt}"
+    clear >&2
+    _tui_title "${title}" >&2
+    _tui_message "${prompt}" >&2
 
     # Display numbered options
     local i
     for i in "${!tags[@]}"; do
         printf "  ${TUI_BOLD}${TUI_CYAN}%2d)${TUI_RESET} %-15s ${TUI_DIM}%s${TUI_RESET}\n" \
-            "$((i + 1))" "${tags[$i]}" "${descs[$i]}"
+            "$((i + 1))" "${tags[$i]}" "${descs[$i]}" >&2
     done
-    echo ""
+    echo "" >&2
 
     # Get selection
     while true; do
-        printf "${TUI_BOLD}Enter selection [1-%d]:${TUI_RESET} " "${#tags[@]}"
-        read -r selection
+        printf "${TUI_BOLD}Enter selection [1-%d]:${TUI_RESET} " "${#tags[@]}" >&2
+        read -r selection </dev/tty
 
         # Check for cancel (empty or 'q')
         if [[ -z "${selection}" ]] || [[ "${selection}" == "q" ]]; then
@@ -243,13 +243,13 @@ tui_menu() {
             return 0
         fi
 
-        printf "${TUI_RED}Invalid selection. Enter 1-%d or q to cancel.${TUI_RESET}\n" "${#tags[@]}"
+        printf "${TUI_RED}Invalid selection. Enter 1-%d or q to cancel.${TUI_RESET}\n" "${#tags[@]}" >&2
     done
 }
 
 # Display a checklist (multiple selection)
 # Args: title prompt height width list_height tag1 desc1 status1 tag2 desc2 status2 ...
-# Outputs space-separated selected tags to stdout
+# Outputs space-separated selected tags to stdout (visual elements go to stderr)
 tui_checklist() {
     local title="$1"
     local prompt="$2"
@@ -277,9 +277,9 @@ tui_checklist() {
     fi
 
     while true; do
-        clear
-        _tui_title "${title}"
-        _tui_message "${prompt}"
+        clear >&2
+        _tui_title "${title}" >&2
+        _tui_message "${prompt}" >&2
 
         # Display options with checkboxes
         local i
@@ -291,12 +291,12 @@ tui_checklist() {
                 checkbox="${TUI_DIM}[ ]${TUI_RESET}"
             fi
             printf "  ${TUI_BOLD}${TUI_CYAN}%2d)${TUI_RESET} %s %-15s ${TUI_DIM}%s${TUI_RESET}\n" \
-                "$((i + 1))" "${checkbox}" "${tags[$i]}" "${descs[$i]}"
+                "$((i + 1))" "${checkbox}" "${tags[$i]}" "${descs[$i]}" >&2
         done
-        echo ""
-        printf "${TUI_DIM}Enter number to toggle, 'd' when done, 'q' to cancel${TUI_RESET}\n"
-        printf "${TUI_BOLD}>${TUI_RESET} "
-        read -r input
+        echo "" >&2
+        printf "${TUI_DIM}Enter number to toggle, 'd' when done, 'q' to cancel${TUI_RESET}\n" >&2
+        printf "${TUI_BOLD}>${TUI_RESET} " >&2
+        read -r input </dev/tty
 
         case "${input}" in
             d|D|done)
@@ -331,7 +331,7 @@ tui_checklist() {
 
 # Display a radiolist (single selection with default)
 # Args: title prompt height width list_height tag1 desc1 status1 tag2 desc2 status2 ...
-# Outputs the selected tag to stdout
+# Outputs the selected tag to stdout (visual elements go to stderr)
 tui_radiolist() {
     local title="$1"
     local prompt="$2"
@@ -358,9 +358,9 @@ tui_radiolist() {
         return 1
     fi
 
-    clear
-    _tui_title "${title}"
-    _tui_message "${prompt}"
+    clear >&2
+    _tui_title "${title}" >&2
+    _tui_message "${prompt}" >&2
 
     # Display numbered options with default marker
     local i
@@ -370,14 +370,14 @@ tui_radiolist() {
             marker=" ${TUI_GREEN}(default)${TUI_RESET}"
         fi
         printf "  ${TUI_BOLD}${TUI_CYAN}%2d)${TUI_RESET} %-15s ${TUI_DIM}%s${TUI_RESET}%s\n" \
-            "$((i + 1))" "${tags[$i]}" "${descs[$i]}" "${marker}"
+            "$((i + 1))" "${tags[$i]}" "${descs[$i]}" "${marker}" >&2
     done
-    echo ""
+    echo "" >&2
 
     # Get selection
     while true; do
-        printf "${TUI_BOLD}Enter selection [1-%d, Enter for default]:${TUI_RESET} " "${#tags[@]}"
-        read -r selection
+        printf "${TUI_BOLD}Enter selection [1-%d, Enter for default]:${TUI_RESET} " "${#tags[@]}" >&2
+        read -r selection </dev/tty
 
         # Handle empty input (use default)
         if [[ -z "${selection}" ]]; then
@@ -398,7 +398,7 @@ tui_radiolist() {
             return 0
         fi
 
-        printf "${TUI_RED}Invalid selection. Enter 1-%d, Enter for default, or q to cancel.${TUI_RESET}\n" "${#tags[@]}"
+        printf "${TUI_RED}Invalid selection. Enter 1-%d, Enter for default, or q to cancel.${TUI_RESET}\n" "${#tags[@]}" >&2
     done
 }
 
