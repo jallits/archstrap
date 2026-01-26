@@ -366,7 +366,7 @@ tui_radiolist() {
     local i
     for i in "${!tags[@]}"; do
         local marker=""
-        if [[ $i -eq ${default_idx} ]]; then
+        if [[ "${i}" -eq "${default_idx}" ]]; then
             marker=" ${TUI_GREEN}(default)${TUI_RESET}"
         fi
         printf "  ${TUI_BOLD}${TUI_CYAN}%2d)${TUI_RESET} %-15s ${TUI_DIM}%s${TUI_RESET}%s\n" \
