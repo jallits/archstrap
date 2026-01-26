@@ -112,12 +112,12 @@ confirm() {
     fi
 
     if [[ "${default}" == "y" ]]; then
-        prompt="${prompt} [Y/n] "
+        printf "%s [Y/n] " "${prompt}"
     else
-        prompt="${prompt} [y/N] "
+        printf "%s [y/N] " "${prompt}"
     fi
 
-    read -r -p "${prompt}" response
+    read -r response </dev/tty
     response="${response:-${default}}"
 
     case "${response}" in
@@ -137,10 +137,12 @@ prompt_input() {
     local response
 
     if [[ -n "${default}" ]]; then
-        read -r -p "${prompt} [${default}]: " response
+        printf "%s [%s]: " "${prompt}" "${default}"
+        read -r response </dev/tty
         echo "${response:-${default}}"
     else
-        read -r -p "${prompt}: " response
+        printf "%s: " "${prompt}"
+        read -r response </dev/tty
         echo "${response}"
     fi
 }
@@ -152,9 +154,11 @@ prompt_password() {
     local confirm
 
     while true; do
-        read -r -s -p "${prompt}: " password
+        printf "%s: " "${prompt}"
+        read -rs password </dev/tty
         echo
-        read -r -s -p "Confirm ${prompt}: " confirm
+        printf "Confirm %s: " "${prompt}"
+        read -rs confirm </dev/tty
         echo
 
         if [[ "${password}" == "${confirm}" ]]; then
@@ -183,7 +187,8 @@ prompt_select() {
     done
 
     while true; do
-        read -r -p "Selection [1-${#options[@]}]: " selection
+        printf "Selection [1-%d]: " "${#options[@]}"
+        read -r selection </dev/tty
         if [[ "${selection}" =~ ^[0-9]+$ ]] && \
            [[ "${selection}" -ge 1 ]] && \
            [[ "${selection}" -le "${#options[@]}" ]]; then
@@ -237,6 +242,10 @@ add_cleanup() {
 
 run_cleanup() {
     log_debug "Running cleanup handlers..."
+    # Handle empty array safely with set -u
+    if [[ ${#cleanup_handlers[@]} -eq 0 ]]; then
+        return 0
+    fi
     for handler in "${cleanup_handlers[@]}"; do
         log_debug "Running cleanup: ${handler}"
         eval "${handler}" || true
