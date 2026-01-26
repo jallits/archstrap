@@ -48,6 +48,9 @@ run_step() {
         "usbutils"
         "pciutils"
 
+        # Removable media management
+        "udisks2"             # D-Bus disk management (allows non-root mount/unmount)
+
         # Mirror and firmware management
         "reflector"           # Mirror list optimization
         "fwupd"               # Firmware updates (BIOS/UEFI)

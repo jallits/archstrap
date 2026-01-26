@@ -573,11 +573,13 @@ tui_select_disk() {
     local prompt="$1"
     local -a menu_items=()
 
+    # Fields: NAME SIZE TRAN MODEL (MODEL last since it can have spaces)
     while IFS= read -r line; do
         local disk size model
         disk=$(echo "${line}" | awk '{print $1}')
         size=$(echo "${line}" | awk '{print $2}')
-        model=$(echo "${line}" | awk '{$1=$2=""; print $0}' | xargs)
+        # Skip field 3 (TRAN), get remaining fields as model
+        model=$(echo "${line}" | awk '{$1=$2=$3=""; print $0}' | xargs)
         [[ -z "${model}" ]] && model="Unknown"
         menu_items+=("${disk}" "${size} - ${model}")
     done < <(disk_list)

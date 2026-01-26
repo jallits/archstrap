@@ -278,18 +278,41 @@ get_available_disks() {
             continue
         fi
         echo "${line}"
-    done < <(lsblk -dpno NAME,SIZE,MODEL,TRAN 2>/dev/null | \
+    # Order: NAME,SIZE,TRAN,MODEL - put MODEL last since it can contain spaces
+    done < <(lsblk -dpno NAME,SIZE,TRAN,MODEL 2>/dev/null | \
         grep -E '^/dev/(sd|nvme|vd|mmcblk)' | \
         grep -v 'loop' || true)
 }
 
 # Get removable disks
+# Considers a disk removable if:
+#   - sysfs reports removable=1
+#   - It's an MMC device (mmcblk*) - SD cards are always removable media
+#   - It's connected via USB transport
 get_removable_disks() {
-    local disk
-    while read -r disk _; do
+    local disk tran
+    # Fields: NAME SIZE TRAN MODEL (MODEL last since it can have spaces)
+    while read -r disk _ tran _; do
+        local disk_name
+        disk_name="$(basename "${disk}")"
+
+        # Check sysfs removable flag
         local removable
-        removable="$(cat "/sys/block/$(basename "${disk}")/removable" 2>/dev/null || echo "0")"
-        if [[ "${removable}" == "1" ]]; then
+        removable="$(cat "/sys/block/${disk_name}/removable" 2>/dev/null || echo "0")"
+
+        # MMC devices (SD cards) are always removable media even if the slot is internal
+        local is_mmc=0
+        if [[ "${disk_name}" == mmcblk* ]]; then
+            is_mmc=1
+        fi
+
+        # USB-connected disks are removable
+        local is_usb=0
+        if [[ "${tran}" == "usb" ]]; then
+            is_usb=1
+        fi
+
+        if [[ "${removable}" == "1" ]] || [[ "${is_mmc}" == "1" ]] || [[ "${is_usb}" == "1" ]]; then
             echo "${disk}"
         fi
     done < <(get_available_disks)

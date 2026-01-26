@@ -28,7 +28,8 @@ disk_list() {
             continue
         fi
         echo "${line}"
-    done < <(lsblk -dpno NAME,SIZE,MODEL,TRAN 2>/dev/null | \
+    # Order: NAME,SIZE,TRAN,MODEL - put MODEL last since it can contain spaces
+    done < <(lsblk -dpno NAME,SIZE,TRAN,MODEL 2>/dev/null | \
         grep -E '^/dev/(sd|nvme|vd|mmcblk)' | \
         grep -v 'loop' || true)
 }

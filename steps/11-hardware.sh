@@ -99,6 +99,10 @@ run_step() {
         run arch-chroot "${MOUNT_POINT}" systemctl enable pcscd.socket
     fi
 
+    # udisks2 for removable media management
+    # udisks2 is D-Bus activated, no service to enable
+    # Desktop environments typically provide automounting (udiskie, gvfs, etc.)
+
     # ============================================
     # MIRROR AND FIRMWARE MANAGEMENT
     # ============================================
