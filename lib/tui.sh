@@ -35,15 +35,20 @@ tui_check() {
 tui_init() {
     # Clear screen and hide cursor during prompts
     clear
-    # Trap to cleanup on exit
-    trap 'tui_cleanup' EXIT
+    # Trap to cleanup on exit (only clean exit clears screen)
+    trap 'tui_cleanup $?' EXIT
 }
 
 # Cleanup TUI
+# Args: $1 = exit code (optional, defaults to 0)
 tui_cleanup() {
+    local exit_code="${1:-0}"
     # Show cursor, reset colors
     printf '%s' $'\033[?25h'"${TUI_RESET}"
-    clear
+    # Only clear screen on successful exit to preserve error messages
+    if [[ "${exit_code}" -eq 0 ]]; then
+        clear
+    fi
 }
 
 # Print a horizontal line
@@ -90,7 +95,7 @@ tui_msgbox() {
     _tui_message "${message}"
 
     printf "${TUI_DIM}Press Enter to continue...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
     return 0
 }
 
@@ -124,7 +129,7 @@ tui_yesno() {
 
     while true; do
         printf "${TUI_BOLD}${prompt}${TUI_RESET} "
-        read -r answer
+        read -r answer </dev/tty
 
         # Handle empty input (use default)
         if [[ -z "${answer}" ]]; then
@@ -493,7 +498,7 @@ tui_programbox() {
     cat
 
     printf "\n${TUI_DIM}Press Enter to continue...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
 }
 
 # Display a text file
@@ -511,7 +516,7 @@ tui_textbox() {
     fi
 
     printf "\n${TUI_DIM}Press Enter to continue...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
 }
 
 # Pause with a message
@@ -525,8 +530,11 @@ tui_pause() {
     _tui_message "${message}"
 
     for ((i=seconds; i>0; i--)); do
-        printf "\r${TUI_DIM}Continuing in %d seconds... (press Enter to skip)${TUI_RESET}" "$i"
-        read -t 1 -r && break
+        printf "\r${TUI_DIM}Continuing in %d seconds... (press Enter to skip)${TUI_RESET}" "${i}"
+        # read -t returns >128 on timeout; use || true to prevent set -e exit
+        if read -t 1 -r </dev/tty 2>/dev/null; then
+            break
+        fi
     done
     echo ""
 }
@@ -557,7 +565,7 @@ EOF
     echo ""
 
     printf "${TUI_DIM}Press Enter to continue...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
 }
 
 # Display disk selection
@@ -603,7 +611,7 @@ tui_confirm_install() {
     printf "${TUI_RED}${TUI_BOLD}WARNING: This will DESTROY all data on the selected disk(s)!${TUI_RESET}\n\n"
 
     printf "Proceed with installation? ${TUI_BOLD}[y/N]${TUI_RESET} "
-    read -r answer
+    read -r answer </dev/tty
 
     case "${answer,,}" in
         y|yes) return 0 ;;
@@ -620,7 +628,7 @@ tui_error() {
     printf "${TUI_RED}%s${TUI_RESET}\n\n" "${message}"
 
     printf "${TUI_DIM}Press Enter to continue...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
 }
 
 # Display completion message
@@ -645,5 +653,5 @@ tui_complete() {
     printf "  3. Log in with your user account\n\n"
 
     printf "${TUI_DIM}Press Enter to exit...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
 }

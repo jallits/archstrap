@@ -269,7 +269,6 @@ luks_format() {
         --pbkdf argon2id
         --use-random
         --batch-mode
-        --sector-size 4096
     )
 
     # Apply encryption strength settings
