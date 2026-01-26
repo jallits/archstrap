@@ -26,51 +26,10 @@ run_step() {
         kernel_vmlinuz="vmlinuz-linux-hardened"
     fi
 
-    # Configure mkinitcpio for systemd-based initramfs
-    log_info "Configuring mkinitcpio"
+    # Configure mkinitcpio preset for UKI generation
+    # Note: mkinitcpio.conf (MODULES/HOOKS) is configured in 08-chroot-prep.sh
+    log_info "Configuring mkinitcpio UKI preset"
     if [[ "${DRY_RUN}" != "1" ]]; then
-        # Build MODULES array based on detected hardware
-        local mkinitcpio_modules="btrfs"
-
-        # Add GPU modules for early KMS (required for Plymouth)
-        local gpus
-        gpus="$(detect_gpu)"
-        log_info "Detected GPU(s): ${gpus}"
-
-        if [[ "${gpus}" == *"nvidia"* ]]; then
-            # NVIDIA modules for early KMS
-            mkinitcpio_modules="${mkinitcpio_modules} nvidia nvidia_modeset nvidia_uvm nvidia_drm"
-            log_info "Adding NVIDIA modules for early KMS"
-        fi
-
-        if [[ "${gpus}" == *"intel"* ]]; then
-            # Intel GPU module
-            mkinitcpio_modules="${mkinitcpio_modules} i915"
-            log_info "Adding Intel i915 module for early KMS"
-        fi
-
-        if [[ "${gpus}" == *"amd"* ]]; then
-            # AMD GPU module
-            mkinitcpio_modules="${mkinitcpio_modules} amdgpu"
-            log_info "Adding AMD amdgpu module for early KMS"
-        fi
-
-        # Create mkinitcpio configuration
-        local mkinitcpio_hooks="systemd autodetect microcode modconf kms keyboard sd-vconsole plymouth sd-encrypt block filesystems fsck"
-
-        # Add AppArmor hook if enabled
-        if [[ "$(config_get enable_apparmor)" == "1" ]]; then
-            mkinitcpio_hooks="systemd autodetect microcode modconf kms keyboard sd-vconsole plymouth apparmor sd-encrypt block filesystems fsck"
-        fi
-
-        cat > "${MOUNT_POINT}/etc/mkinitcpio.conf" << EOF
-MODULES=(${mkinitcpio_modules})
-BINARIES=()
-FILES=()
-HOOKS=(${mkinitcpio_hooks})
-EOF
-
-        # Configure mkinitcpio for UKI generation
         mkdir -p "${MOUNT_POINT}/etc/mkinitcpio.d"
         cat > "${MOUNT_POINT}/etc/mkinitcpio.d/${kernel_name}.preset" << EOF
 ALL_config="/etc/mkinitcpio.conf"
