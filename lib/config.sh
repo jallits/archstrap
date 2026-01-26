@@ -113,6 +113,11 @@ step_complete() {
 step_is_complete() {
     local step="$1"
 
+    # Handle empty array safely with set -u
+    if [[ ${#COMPLETED_STEPS[@]} -eq 0 ]]; then
+        return 1
+    fi
+
     for completed in "${COMPLETED_STEPS[@]}"; do
         if [[ "${completed}" == "${step}" ]]; then
             return 0
