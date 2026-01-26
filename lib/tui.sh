@@ -90,7 +90,7 @@ tui_msgbox() {
     _tui_message "${message}"
 
     printf "${TUI_DIM}Press Enter to continue...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
     return 0
 }
 
@@ -124,7 +124,7 @@ tui_yesno() {
 
     while true; do
         printf "${TUI_BOLD}${prompt}${TUI_RESET} "
-        read -r answer
+        read -r answer </dev/tty
 
         # Handle empty input (use default)
         if [[ -z "${answer}" ]]; then
@@ -493,7 +493,7 @@ tui_programbox() {
     cat
 
     printf "\n${TUI_DIM}Press Enter to continue...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
 }
 
 # Display a text file
@@ -511,7 +511,7 @@ tui_textbox() {
     fi
 
     printf "\n${TUI_DIM}Press Enter to continue...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
 }
 
 # Pause with a message
@@ -557,7 +557,7 @@ EOF
     echo ""
 
     printf "${TUI_DIM}Press Enter to continue...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
 }
 
 # Display disk selection
@@ -603,7 +603,7 @@ tui_confirm_install() {
     printf "${TUI_RED}${TUI_BOLD}WARNING: This will DESTROY all data on the selected disk(s)!${TUI_RESET}\n\n"
 
     printf "Proceed with installation? ${TUI_BOLD}[y/N]${TUI_RESET} "
-    read -r answer
+    read -r answer </dev/tty
 
     case "${answer,,}" in
         y|yes) return 0 ;;
@@ -620,7 +620,7 @@ tui_error() {
     printf "${TUI_RED}%s${TUI_RESET}\n\n" "${message}"
 
     printf "${TUI_DIM}Press Enter to continue...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
 }
 
 # Display completion message
@@ -645,5 +645,5 @@ tui_complete() {
     printf "  3. Log in with your user account\n\n"
 
     printf "${TUI_DIM}Press Enter to exit...${TUI_RESET}"
-    read -r
+    read -r </dev/tty
 }
