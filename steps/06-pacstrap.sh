@@ -195,22 +195,23 @@ run_step() {
     log_info "Installing packages with pacstrap..."
     log_info "This may take a while depending on your internet connection"
 
+    # Sync pacman database first to catch connectivity issues early
+    log_info "Syncing pacman database..."
+    if ! run pacman -Sy; then
+        log_error "Failed to sync pacman database"
+        log_error "Check your network connection and mirror configuration"
+        log_info "Try running: reflector --protocol https --sort rate --fastest 5 --save /etc/pacman.d/mirrorlist"
+        exit 1
+    fi
+
+    # Update keyring if it's outdated (common issue on older ISOs)
+    log_info "Ensuring keyring is up to date..."
+    run pacman -Sy --noconfirm archlinux-keyring 2>/dev/null || true
+
+    # Install base system
     if [[ "${DRY_RUN}" == "1" ]]; then
         echo -e "${MAGENTA}[DRY-RUN]${RESET} pacstrap -K ${MOUNT_POINT} ${base_packages[*]}"
     else
-        # Sync pacman database first to catch connectivity issues early
-        log_info "Syncing pacman database..."
-        if ! pacman -Sy; then
-            log_error "Failed to sync pacman database"
-            log_error "Check your network connection and mirror configuration"
-            log_info "Try running: reflector --protocol https --sort rate --fastest 5 --save /etc/pacman.d/mirrorlist"
-            exit 1
-        fi
-
-        # Update keyring if it's outdated (common issue on older ISOs)
-        log_info "Ensuring keyring is up to date..."
-        pacman -Sy --noconfirm archlinux-keyring 2>/dev/null || true
-
         pacstrap -K "${MOUNT_POINT}" "${base_packages[@]}"
     fi
 
