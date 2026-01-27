@@ -71,9 +71,15 @@ run_step() {
         # Build HOOKS array
         local mkinitcpio_hooks="systemd autodetect microcode modconf kms keyboard sd-vconsole plymouth sd-encrypt block filesystems fsck"
 
-        # Add AppArmor hook if enabled (must come before sd-encrypt)
+        # Add AppArmor hook if enabled AND the hook exists (must come before sd-encrypt)
         if [[ "$(config_get enable_apparmor)" == "1" ]]; then
-            mkinitcpio_hooks="systemd autodetect microcode modconf kms keyboard sd-vconsole plymouth apparmor sd-encrypt block filesystems fsck"
+            if [[ -f "${MOUNT_POINT}/usr/lib/initcpio/install/apparmor" ]]; then
+                mkinitcpio_hooks="systemd autodetect microcode modconf kms keyboard sd-vconsole plymouth apparmor sd-encrypt block filesystems fsck"
+                log_info "AppArmor mkinitcpio hook found and enabled"
+            else
+                log_warn "AppArmor enabled but mkinitcpio hook not found"
+                log_warn "AppArmor will be enabled at runtime but not in initramfs"
+            fi
         fi
 
         cat > "${MOUNT_POINT}/etc/mkinitcpio.conf" << EOF
